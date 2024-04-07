@@ -6,8 +6,8 @@
 
 /* Ethernet header */
 struct ethheader {
-  u_char  ether_dhost[6]; /* destination host address */
-  u_char  ether_shost[6]; /* source host address */
+  u_char  ether_dhost[6]; /* dst mac */
+  u_char  ether_shost[6]; /* src mac */
   u_short ether_type;     /* protocol type (IP, ARP, RARP, etc) */
 };
 
@@ -62,15 +62,15 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header,
     struct tcpheader * tcp = (struct tcpheader *)
                            (packet + sizeof(struct ethheader)+sizeof(struct ipheader)); 
 
-    //mac주소
+    //src mac, dst mac
     printf("Source MAC: %s\n", ether_ntoa((struct ether_addr *)eth->ether_shost));
     printf("Destination MAC: %s\n", ether_ntoa((struct ether_addr *)eth->ether_dhost));
 
-    //tcp주소
+    //src port, dst port
     printf("Source Port: %d\n", ntohs(tcp->tcp_sport));
     printf("Destination Port: %d\n", ntohs(tcp->tcp_dport));
 
-    //ip주소
+    //src ip, dst ip
     printf("       From: %s\n", inet_ntoa(ip->iph_sourceip));   
     printf("         To: %s\n", inet_ntoa(ip->iph_destip));    
   }
@@ -84,7 +84,7 @@ int main()
   char filter_exp[] = "tcp";
   bpf_u_int32 net;
 
-  // Step 1: Open live pcap session on NIC with name enp0s3
+  // Step 1: Open live pcap session on NIC with name eth0
   handle = pcap_open_live("eth0", BUFSIZ, 1, 1000, errbuf);
 
   // Step 2: Compile filter_exp into BPF psuedo-code
